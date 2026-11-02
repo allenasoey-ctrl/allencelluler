@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CellularStore - Jual Beli HP Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Header / Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="filterBrand('all')">
+                <div class="bg-indigo-600 text-white p-2 rounded-xl flex items-center justify-center shadow-md shadow-indigo-100">
+                    <i class="fa-solid font-bold fa-mobile-screen-button text-xl"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">CellularStore</span>
+                    <span class="text-xs block text-slate-400 -mt-1 font-medium">Pusat HP Murah & Original</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openAddModal()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold px-3 sm:px-4 py-2 rounded-xl text-sm transition flex items-center space-x-2 border border-indigo-200">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <span class="hidden sm:inline">Tambah HP</span>
+                </button>
+                <button onclick="toggleCartModal()" class="relative bg-indigo-600 hover:bg-indigo-700 text-white p-2.5 sm:px-4 sm:py-2 rounded-xl text-sm font-semibold transition flex items-center space-x-2 shadow-md shadow-indigo-200">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="hidden sm:inline">Keranjang</span>
+                    <span id="cartCount" class="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-3 text-center md:text-left">
+                <span class="bg-indigo-500/30 text-indigo-200 text-xs font-semibold px-3 py-1 rounded-full border border-indigo-400/30">Garansi Resmi & Import</span>
+                <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight">Dapatkan Smartphone Impianmu Bergaransi Resmi</h1>
+                <p class="text-slate-300 text-sm sm:text-base max-w-xl">Layanan jual beli HP baru & bekas berkualitas tinggi. Transaksi cepat via WA dan berbagai metode pembayaran terpercaya.</p>
+            </div>
+            <!-- Payment Badges Banner -->
+            <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/10 flex flex-wrap justify-center items-center gap-3 text-xs">
+                <span class="font-semibold text-slate-200">Metode Bayar:</span>
+                <span class="bg-white text-indigo-900 font-bold px-2.5 py-1 rounded-md shadow-sm">QRIS</span>
+                <span class="bg-blue-500 text-white font-bold px-2.5 py-1 rounded-md">DANA</span>
+                <span class="bg-purple-600 text-white font-bold px-2.5 py-1 rounded-md">OVO</span>
+                <span class="bg-slate-200 text-slate-800 font-bold px-2.5 py-1 rounded-md">Transfer Bank</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+        <!-- Search and Filter Section -->
+        <div class="flex flex-col md:flex-row gap-4 items-center justify-between mb-8">
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-96">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="searchInput" oninput="renderProducts()" placeholder="Cari merk atau tipe HP..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition">
+            </div>
+
+            <!-- Brand Filter Badges -->
+            <div class="flex items-center space-x-2 overflow-x-auto hide-scrollbar w-full md:w-auto pb-2 md:pb-0">
+                <button onclick="filterBrand('all')" class="brand-btn active-brand bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="all">Semua</button>
+                <button onclick="filterBrand('Apple')" class="brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="Apple">Apple</button>
+                <button onclick="filterBrand('Samsung')" class="brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="Samsung">Samsung</button>
+                <button onclick="filterBrand('Xiaomi')" class="brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="Xiaomi">Xiaomi</button>
+                <button onclick="filterBrand('Oppo')" class="brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="Oppo">Oppo</button>
+                <button onclick="filterBrand('Vivo')" class="brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition" data-brand="Vivo">Vivo</button>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Dynamic Content Generated via JS -->
+        </div>
+    </main>
+
+    <!-- Payment & Info Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-slate-600 text-sm">
+            <div>
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <i class="fa-solid fa-wallet text-indigo-600"></i>
+                    <span>Metode Pembayaran</span>
+                </h3>
+                <div class="space-y-2">
+                    <p><strong class="text-slate-800">E-Wallet:</strong> QRIS, DANA, OVO</p>
+                    <p><strong class="text-slate-800">Transfer Bank:</strong> BRI, BCA, Mandiri, BJB</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-600"></i>
+                    <span>Cara Pemesanan</span>
+                </h3>
+                <p>Pilih HP yang diinginkan, tambahkan ke keranjang, klik <strong>Checkout via WA</strong>. Pesanan Anda akan diforward langsung ke Admin WhatsApp kami.</p>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-blue-600"></i>
+                    <span>Jaminan Pelayanan</span>
+                </h3>
+                <p>Setiap HP yang dijual telah melalui proses <i>Quality Control</i> ketat. Bebas konsultasi via WhatsApp sebelum beli!</p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto border-t border-slate-100 mt-8 pt-4 text-center text-xs text-slate-400">
+            &copy; 2026 CellularStore. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- MODAL 1: Tambah HP Baru ke Etalase -->
+    <div id="addModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative my-8">
+            <button onclick="closeAddModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-square-plus text-indigo-600"></i>
+                <span>Tambah HP ke Etalase</span>
+            </h2>
+
+            <form id="addPhoneForm" onsubmit="handleAddPhone(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Merk HP</label>
+                    <select id="phoneBrand" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="Apple">Apple</option>
+                        <option value="Samsung">Samsung</option>
+                        <option value="Xiaomi">Xiaomi</option>
+                        <option value="Oppo">Oppo</option>
+                        <option value="Vivo">Vivo</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Tipe / Model</label>
+                    <input type="text" id="phoneName" placeholder="Contoh: iPhone 15 Pro Max / Galaxy S24" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kondisi</label>
+                    <select id="phoneCondition" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="Baru (BNIB)">Baru (BNIB)</option>
+                        <option value="Bekas (Like New)">Bekas (Like New)</option>
+                        <option value="Bekas (Mulus)">Bekas (Mulus)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Harga (Rp)</label>
+                    <input type="number" id="phonePrice" placeholder="Contoh: 12500000" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Spesifikasi Singkat</label>
+                    <textarea id="phoneSpecs" placeholder="RAM 8GB, Internal 256GB, Garansi Resmi..." rows="2" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">URL Gambar (Opsional)</label>
+                    <input type="url" id="phoneImg" placeholder="https://..." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <span class="text-[10px] text-slate-400">Kosongkan untuk menggunakan gambar default.</span>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeAddModal()" class="w-1/2 py-2.5 border border-slate-200 rounded-xl text-slate-600 text-sm font-semibold hover:bg-slate-50 transition">Batal</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-semibold shadow-md shadow-indigo-200 transition">Simpan HP</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Keranjang Belanja & Checkout -->
+    <div id="cartModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative my-8">
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h2 class="text-xl font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                <i class="fa-solid fa-cart-shopping text-indigo-600"></i>
+                <span>Keranjang Belanja</span>
+            </h2>
+
+            <!-- Items List -->
+            <div id="cartItems" class="space-y-3 max-h-60 overflow-y-auto pr-1 mb-4 border-b border-slate-100 pb-4">
+                <!-- Items populated by JS -->
+            </div>
+
+            <!-- Checkout Info Form -->
+            <div id="checkoutSection" class="space-y-3">
+                <div class="flex justify-between items-center font-bold text-base text-slate-900">
+                    <span>Total Bayar:</span>
+                    <span id="cartTotalPrice" class="text-indigo-600">Rp 0</span>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nama Pembeli</label>
+                    <input type="text" id="buyerName" placeholder="Masukkan nama Anda..." class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Metode Pembayaran</label>
+                    <select id="paymentMethod" onchange="togglePaymentDetails()" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        <option value="" disabled selected>-- Pilih Metode Pembayaran --</option>
+                        <optgroup label="E-Wallet">
+                            <option value="QRIS">QRIS All Payment</option>
+                            <option value="DANA">DANA</option>
+                            <option value="OVO">OVO</option>
+                        </optgroup>
+                        <optgroup label="Transfer Bank">
+                            <option value="BCA">Bank BCA</option>
+                            <option value="BRI">Bank BRI</option>
+                            <option value="Mandiri">Bank Mandiri</option>
+                            <option value="BJB">Bank BJB</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Detail Rekening / Payment Info Display -->
+                <div id="paymentInfoBox" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-1">
+                    <p id="paymentAccountTitle" class="font-bold text-slate-900"></p>
+                    <p id="paymentAccountDetail" class="font-mono text-indigo-600 bg-white p-2 rounded border border-slate-200 select-all"></p>
+                    <p class="text-[11px] text-slate-500">*Simpan info pembayaran ini untuk diupload/dikonfirmasi saat chat WA.</p>
+                </div>
+
+                <button onclick="checkoutToWA()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold shadow-md shadow-emerald-200 transition flex items-center justify-center space-x-2 mt-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i>
+                    <span>Order via WhatsApp</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2"></div>
+
+    <script>
+        // Data Stok HP Awal (Mock Data)
+        let phoneProducts = [
+            {
+                id: 1,
+                brand: "Apple",
+                name: "iPhone 15 Pro",
+                condition: "Baru (BNIB)",
+                price: 18990000,
+                specs: "RAM 8GB, 128GB, Titan Natural, Garansi IBOX 1 Tahun",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=iPhone+15+Pro"
+            },
+            {
+                id: 2,
+                brand: "Samsung",
+                name: "Galaxy S24 Ultra",
+                condition: "Baru (BNIB)",
+                price: 19990000,
+                specs: "RAM 12GB, 256GB, Titanium Gray, Galaxy AI",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=Galaxy+S24+Ultra"
+            },
+            {
+                id: 3,
+                brand: "Xiaomi",
+                name: "Xiaomi 14",
+                condition: "Baru (BNIB)",
+                price: 11990000,
+                specs: "Leica Camera, Snapdragon 8 Gen 3, 12/256GB",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=Xiaomi+14"
+            },
+            {
+                id: 4,
+                brand: "Oppo",
+                name: "Oppo Reno 11 Pro 5G",
+                condition: "Bekas (Like New)",
+                price: 7499000,
+                specs: "RAM 12GB, 512GB, Fullset Original, Garansi Aktif",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=Oppo+Reno+11"
+            },
+            {
+                id: 5,
+                brand: "Vivo",
+                name: "Vivo X100 Pro",
+                condition: "Baru (BNIB)",
+                price: 15990000,
+                specs: "Zeiss Camera, Dimensity 9300, 16/512GB",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=Vivo+X100+Pro"
+            },
+            {
+                id: 6,
+                brand: "Apple",
+                name: "iPhone 13",
+                condition: "Bekas (Mulus)",
+                price: 9200000,
+                specs: "BH 89%, Fullset, Midnight Blue 128GB",
+                img: "https://placehold.co/400x300/e2e8f0/475569?text=iPhone+13"
+            }
+        ];
+
+        // Keranjang Belanja
+        let cart = [];
+        let activeFilter = "all";
+        const adminWA = "6287842091048"; // Nomor WhatsApp Toko Updated
+
+        // Format Currency Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(number);
+        }
+
+        // Render Katalog HP
+        function renderProducts() {
+            const grid = document.getElementById("productGrid");
+            const searchQuery = document.getElementById("searchInput").value.toLowerCase();
+
+            grid.innerHTML = "";
+
+            const filtered = phoneProducts.filter(item => {
+                const matchBrand = activeFilter === "all" || item.brand === activeFilter;
+                const matchSearch = item.name.toLowerCase().includes(searchQuery) || item.brand.toLowerCase().includes(searchQuery) || item.specs.toLowerCase().includes(searchQuery);
+                return matchBrand && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-mobile-xmark text-4xl mb-3"></i>
+                        <p class="font-medium">Tidak ada HP yang sesuai dengan pencarian/kategori.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement("div");
+                card.className = "bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between group";
+                card.innerHTML = `
+                    <div>
+                        <div class="relative bg-slate-100 h-48 overflow-hidden">
+                            <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/400x300/e2e8f0/475569?text=HP+Cellular'">
+                            <span class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-semibold px-2.5 py-1 rounded-full uppercase">
+                                ${item.brand}
+                            </span>
+                            <span class="absolute top-3 right-3 ${item.condition.includes('Baru') ? 'bg-emerald-500' : 'bg-amber-500'} text-white text-[10px] font-bold px-2 py-1 rounded-md">
+                                ${item.condition}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-slate-900 text-base mb-1">${item.name}</h3>
+                            <p class="text-xs text-slate-500 line-clamp-2 mb-3">${item.specs}</p>
+                            <p class="text-lg font-extrabold text-indigo-600">${formatRupiah(item.price)}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0 flex gap-2">
+                        <button onclick="addToCart(${item.id})" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold py-2.5 rounded-xl transition flex items-center justify-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>Beli</span>
+                        </button>
+                        <button onclick="deleteProduct(${item.id})" title="Hapus dari etalase" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2.5 rounded-xl text-xs transition border border-red-200">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Filter Brand Handler
+        function filterBrand(brand) {
+            activeFilter = brand;
+            document.querySelectorAll(".brand-btn").forEach(btn => {
+                if (btn.getAttribute("data-brand") === brand) {
+                    btn.className = "brand-btn active-brand bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition";
+                } else {
+                    btn.className = "brand-btn bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition";
+                }
+            });
+            renderProducts();
+        }
+
+        // Modal Tambah HP
+        function openAddModal() {
+            document.getElementById("addModal").classList.remove("hidden");
+            document.getElementById("addModal").classList.add("flex");
+        }
+
+        function closeAddModal() {
+            document.getElementById("addModal").classList.add("hidden");
+            document.getElementById("addModal").classList.remove("flex");
+            document.getElementById("addPhoneForm").reset();
+        }
+
+        // Handle Form Tambah HP
+        function handleAddPhone(e) {
+            e.preventDefault();
+            const brand = document.getElementById("phoneBrand").value;
+            const name = document.getElementById("phoneName").value;
+            const condition = document.getElementById("phoneCondition").value;
+            const price = parseInt(document.getElementById("phonePrice").value);
+            const specs = document.getElementById("phoneSpecs").value;
+            let img = document.getElementById("phoneImg").value;
+
+            if (!img) {
+                img = `https://placehold.co/400x300/e2e8f0/475569?text=${encodeURIComponent(name)}`;
+            }
+
+            const newPhone = {
+                id: Date.now(),
+                brand,
+                name,
+                condition,
+                price,
+                specs,
+                img
+            };
+
+            phoneProducts.unshift(newPhone);
+            renderProducts();
+            closeAddModal();
+            showToast(`Berhasil menambahkan ${name} ke etalase!`);
+        }
+
+        // Handle Hapus HP dari Etalase
+        function deleteProduct(id) {
+            const product = phoneProducts.find(p => p.id === id);
+            if (confirm(`Apakah Anda yakin ingin menghapus "${product ? product.name : 'HP'}" dari etalase?`)) {
+                phoneProducts = phoneProducts.filter(p => p.id !== id);
+                // Hapus juga dari keranjang jika ada
+                cart = cart.filter(item => item.id !== id);
+                updateCartUI();
+                renderProducts();
+                showToast("HP berhasil dihapus dari etalase!");
+            }
+        }
+
+        // Keranjang Belanja Functions
+        function addToCart(id) {
+            const product = phoneProducts.find(p => p.id === id);
+            if (!product) return;
+
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.qty += 1;
+            } else {
+                cart.push({ ...product, qty: 1 });
+            }
+
+            updateCartUI();
+            showToast(`${product.name} ditambahkan ke keranjang!`);
+        }
+
+        function updateCartQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.qty += delta;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+            }
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const countElem = document.getElementById("cartCount");
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            countElem.innerText = totalQty;
+
+            const cartItemsElem = document.getElementById("cartItems");
+            const totalPriceElem = document.getElementById("cartTotalPrice");
+
+            if (cart.length === 0) {
+                cartItemsElem.innerHTML = `
+                    <div class="text-center py-6 text-slate-400">
+                        <i class="fa-solid fa-basket-shopping text-3xl mb-2"></i>
+                        <p class="text-xs">Keranjang Anda masih kosong.</p>
+                    </div>
+                `;
+                totalPriceElem.innerText = "Rp 0";
+                return;
+            }
+
+            cartItemsElem.innerHTML = "";
+            let total = 0;
+
+            cart.forEach(item => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+
+                const itemRow = document.createElement("div");
+                itemRow.className = "flex items-center justify-between bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs";
+                itemRow.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${item.img}" class="w-10 h-10 object-cover rounded-lg">
+                        <div>
+                            <h4 class="font-bold text-slate-800">${item.name}</h4>
+                            <p class="text-indigo-600 font-semibold">${formatRupiah(item.price)}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-md bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100">-</button>
+                        <span class="font-bold w-4 text-center">${item.qty}</span>
+                        <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-md bg-white border border-slate-300 font-bold flex items-center justify-center hover:bg-slate-100">+</button>
+                    </div>
+                `;
+                cartItemsElem.appendChild(itemRow);
+            });
+
+            totalPriceElem.innerText = formatRupiah(total);
+        }
+
+        function toggleCartModal() {
+            const modal = document.getElementById("cartModal");
+            if (modal.classList.contains("hidden")) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            } else {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+        }
+
+        // Tampilkan Info Detail Pembayaran berdasarkan pilihan
+        function togglePaymentDetails() {
+            const method = document.getElementById("paymentMethod").value;
+            const infoBox = document.getElementById("paymentInfoBox");
+            const accountTitle = document.getElementById("paymentAccountTitle");
+            const accountDetail = document.getElementById("paymentAccountDetail");
+
+            if (!method) {
+                infoBox.classList.add("hidden");
+                return;
+            }
+
+            infoBox.classList.remove("hidden");
+
+            const paymentData = {
+                "QRIS": { title: "QRIS All Payment", detail: "Scan QRIS Toko (Nomor ID: ID10293847561)" },
+                "DANA": { title: "E-Wallet DANA", detail: "0812-3456-7890 a/n CellularStore" },
+                "OVO": { title: "E-Wallet OVO", detail: "0812-3456-7890 a/n CellularStore" },
+                "BCA": { title: "Bank BCA", detail: "No. Rek: 8830-1928-33 a/n CellularStore" },
+                "BRI": { title: "Bank BRI", detail: "No. Rek: 0012-0102-9384-503 a/n CellularStore" },
+                "Mandiri": { title: "Bank Mandiri", detail: "No. Rek: 137-00-1234567-8 a/n CellularStore" },
+                "BJB": { title: "Bank BJB", detail: "No. Rek: 0021-9876-5432-1 a/n CellularStore" }
+            };
+
+            if (paymentData[method]) {
+                accountTitle.innerText = paymentData[method].title;
+                accountDetail.innerText = paymentData[method].detail;
+            }
+        }
+
+        // Checkout ke WA
+        function checkoutToWA() {
+            if (cart.length === 0) {
+                alert("Keranjang Anda masih kosong!");
+                return;
+            }
+
+            const buyerName = document.getElementById("buyerName").value.trim();
+            const paymentMethod = document.getElementById("paymentMethod").value;
+
+            if (!buyerName) {
+                alert("Silakan masukkan Nama Anda terlebih dahulu!");
+                return;
+            }
+
+            if (!paymentMethod) {
+                alert("Silakan pilih Metode Pembayaran!");
+                return;
+            }
+
+            let message = `Halo Admin CellularStore, saya ingin memesan HP berikut:\n\n`;
+            message += `👤 *Nama Pembeli:* ${buyerName}\n`;
+            message += `💳 *Metode Pembayaran:* ${paymentMethod}\n`;
+            message += `-----------------------------------\n`;
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                const subtotal = item.price * item.qty;
+                total += subtotal;
+                message += `${index + 1}. *${item.name}* (${item.condition})\n`;
+                message += `   Jumlah: ${item.qty} x ${formatRupiah(item.price)} = ${formatRupiah(subtotal)}\n`;
+            });
+
+            message += `-----------------------------------\n`;
+            message += `💰 *Total Pembayaran:* ${formatRupiah(total)}\n\n`;
+            message += `Mohon konfirmasi pesanan dan instruksi pembayaran selengkapnya. Terima kasih!`;
+
+            const encodedMsg = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${adminWA}?text=${encodedMsg}`;
+
+            window.open(waUrl, "_blank");
+        }
+
+        // Notification Toast Component
+        function showToast(text) {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+            toast.className = "bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-lg flex items-center space-x-2 transition transform translate-y-2 opacity-0";
+            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i><span>${text}</span>`;
+            
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove("translate-y-2", "opacity-0");
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add("opacity-0");
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Inisialisasi awal
+        window.onload = function() {
+            renderProducts();
+            updateCartUI();
+        }
+    </script>
+</body>
+</html>
